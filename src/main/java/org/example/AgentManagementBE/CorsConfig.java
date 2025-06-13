@@ -11,10 +11,12 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**") // Cho phép tất cả các endpoint
                 .allowedOrigins("http://localhost:5174")
                 .allowedOrigins("http://localhost:5173") 
-                .allowedOrigins("http://localhost:5175") 
+                .allowedOrigins("http://localhost:5175")
+                .allowedOrigins("https://*.onrender.com") // Cho phép từ Render domains
+                .allowedOrigins("*") // Cho phép tất cả origin cho production (có thể giới hạn sau)
                 // Cho phép nguồn gốc từ React frontend
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Các phương thức được phép
                 .allowedHeaders("*") // Cho phép tất cả header
-                .allowCredentials(true); // Cho phép gửi cookie nếu cần
+                .allowCredentials(false); // Tắt credentials khi allow all origins
     }
 }

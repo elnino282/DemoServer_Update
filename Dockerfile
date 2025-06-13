@@ -1,5 +1,5 @@
-# Use OpenJDK 17 as base image
-FROM openjdk:17-jdk-slim
+# Multi-stage build for optimized image size
+FROM openjdk:17-jdk-slim as builder
 
 # Set working directory
 WORKDIR /app
@@ -10,20 +10,46 @@ COPY mvnw.cmd .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline
+# Download dependencies (cached layer)
+RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests -B
+
+# Production image
+FROM openjdk:17-jre-slim
+
+# Install necessary packages and create non-root user
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r appuser && useradd -r -g appuser appuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy jar from builder stage
+COPY --from=builder /app/target/AgentManagementBE-0.0.1-SNAPSHOT.jar app.jar
+
+# Change ownership to non-root user
+RUN chown appuser:appuser app.jar
+
+# Switch to non-root user
+USER appuser
 
 # Expose port
 EXPOSE 8080
 
-# Set environment variable for production
+# Set JVM options for production
+ENV JAVA_OPTS="-server -Xmx512m -Xms256m -XX:+UseG1GC -Djava.security.egd=file:/dev/./urandom"
 ENV SPRING_PROFILES_ACTIVE=prod
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/api/health || exit 1
+
 # Run the application
-CMD ["java", "-jar", "target/AgentManagementBE-0.0.1-SNAPSHOT.jar"] 
+CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"] 

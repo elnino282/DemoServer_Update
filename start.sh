@@ -1,3 +1,5 @@
 #!/bin/bash
 echo "Starting Spring Boot application..."
-java -Dspring.profiles.active=prod -jar target/AgentManagementBE-0.0.1-SNAPSHOT.jar 
+export SPRING_PROFILES_ACTIVE=prod
+echo "Profile set to: $SPRING_PROFILES_ACTIVE"
+java -jar target/AgentManagementBE-0.0.1-SNAPSHOT.jar 

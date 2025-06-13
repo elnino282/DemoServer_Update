@@ -74,7 +74,7 @@
 			<version>13.0</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Clever Cloud specific dependencies -->
+		<!-- Monitoring and health check dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
@@ -101,17 +101,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-				</configuration>
-			</plugin>
-			<!-- Plugin for Clever Cloud deployment -->
-			<plugin>
-				<groupId>com.heroku.sdk</groupId>
-				<artifactId>heroku-maven-plugin</artifactId>
-				<version>3.0.7</version>
-				<configuration>
-					<processTypes>
-						<web>java -jar target/${project.build.finalName}.jar</web>
-					</processTypes>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>

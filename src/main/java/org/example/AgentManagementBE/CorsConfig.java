@@ -9,14 +9,17 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Cho phép tất cả các endpoint
-                .allowedOrigins("http://localhost:5174")
-                .allowedOrigins("http://localhost:5173") 
-                .allowedOrigins("http://localhost:5175")
-                .allowedOrigins("https://*.onrender.com") // Cho phép từ Render domains
-                .allowedOrigins("*") // Cho phép tất cả origin cho production (có thể giới hạn sau)
-                // Cho phép nguồn gốc từ React frontend
+                .allowedOrigins(
+                    "http://localhost:5173",
+                    "http://localhost:5174", 
+                    "http://localhost:5175",
+                    "https://*.onrender.com",
+                    "https://*.vercel.app",
+                    "https://*.netlify.app"
+                ) // Các domain được phép
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Các phương thức được phép
                 .allowedHeaders("*") // Cho phép tất cả header
-                .allowCredentials(false); // Tắt credentials khi allow all origins
+                .allowCredentials(true) // Cho phép credentials
+                .maxAge(3600); // Cache preflight response
     }
 }
